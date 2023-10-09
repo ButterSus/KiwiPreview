@@ -1,0 +1,13 @@
+@class SyntaxAnalyzer
+@header '''
+from __future__ import annotations
+
+from typing import List, Optional, Tuple, Union
+from pegen.parser import memoize, memoize_left_rec, Parser
+from pegen.tokenizer import Tokenizer
+
+
+start:
+    | NUMBER NEWLINE ENDMARKER
+
+
