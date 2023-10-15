@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="Black">
-    <option name="pathToExecutable" value="C:\Users\Days_\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\Scripts\black.exe" />
-    <option name="sdkUUID" value="c05f9734-3c19-4e7f-8df4-c0760679f3c6" />
-  </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (KiwiPreview)" project-jdk-type="Python SDK" />
-</project>
