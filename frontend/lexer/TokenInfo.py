@@ -79,25 +79,23 @@ class TokenInfo(tokenize.TokenInfo):
             The formatted string
         """
         return FormatString(
-            string=f'''{FormatString(
-                string=self.row,
-                color=TextColor.YELLOW,
-                bold=True,
-                minlength=2,
-            )} | {FormatString(
-                string=self.column,
-                color=TextColor.YELLOW,
-                bold=True,
-                minlength=2,
-            )} | {FormatString(
-                string=self.type.name,
-                color=TextColor.BLUE,
-                bold=True,
-                minlength=20,
-                maxlength=20,
-            )} | {FormatString(
-                string=self.value,
-                color=TextColor.GREEN,
-                bold=True,
-            )}'''
+            string=self.row,
+            color=TextColor.YELLOW,
+            bold=True,
+            minlength=2,
+        ) + ' | ' + FormatString(
+            string=self.column,
+            color=TextColor.YELLOW,
+            bold=True,
+            minlength=2,
+        ) + ' | ' + FormatString(
+            string=self.type.name,
+            color=TextColor.BLUE,
+            bold=True,
+            minlength=20,
+            maxlength=20,
+        ) + ' | ' + FormatString(
+            string=self.value,
+            color=TextColor.GREEN,
+            bold=True,
         )

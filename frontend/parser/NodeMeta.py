@@ -86,6 +86,8 @@ class NodeMeta(ABCMeta):
             k: v for k, v in kwargs.items() if k not in {'is_base', 'base', 'no_track'}
         }
         namespace['name'] = field(default=name, init=False, repr=True, compare=True)
+        children: typing.List[typing.Any] = list()
+        namespace['children'] = field(default_factory=lambda: children, init=False, repr=False, compare=False)
         if kwargs.get('is_base', False):
             # noinspection PyTypeChecker
             return super().__new__(mcs, name, bases, namespace, **post_kwargs)
@@ -96,16 +98,16 @@ class NodeMeta(ABCMeta):
             namespace['__annotations__'] = dict()
         if 'name' not in namespace['__annotations__']:
             namespace['__annotations__']['name'] = 'str'
+        if 'children' not in namespace['__annotations__']:
+            namespace['__annotations__']['children'] = typing.List[str]
 
         # Row and column fields
         # --------------------->
-        children: typing.List[typing.Any] = ...
-
         def lazy_init():
             def isValidAttribute(key: str, annotations) -> bool:
                 value: str = annotations.get(key, None)
-                if isinstance(value, str) and (match := re.match(r'(typing\.List|list)\[(.*?)]', value, re.DOTALL)):
-                    value = match.group(2)
+                if isinstance(value, str):
+                    value = re.sub(r"\[(.*?)]", str(), value)
                 if isinstance(value, MetaEffectWrapper):
                     effectWrapper: MetaEffectWrapper = value
                     if MetaEffect.IGNORED_FIELD in value.effects:
@@ -132,28 +134,25 @@ class NodeMeta(ABCMeta):
                 )
             )
             new_set.discard('name')
-            children = list(new_set)
+            new_set.discard('children')
+            children.extend(new_set)
 
-        namespace['__annotations__']['row'] = field(init=False, repr=False, compare=True)
-        namespace['__annotations__']['column'] = field(init=False, repr=False, compare=True)
-        namespace['__annotations__']['end_row'] = field(init=False, repr=False, compare=True)
-        namespace['__annotations__']['end_column'] = field(init=False, repr=False, compare=True)
+        if 'row' not in namespace['__annotations__']:
+            namespace['__annotations__']['row'] = 'int'
+        namespace['row'] = field(init=False, repr=False, compare=True)
+        if 'column' not in namespace['__annotations__']:
+            namespace['__annotations__']['column'] = 'int'
+        namespace['column'] = field(init=False, repr=False, compare=True)
+        if 'end_row' not in namespace['__annotations__']:
+            namespace['__annotations__']['end_row'] = 'int'
+        namespace['end_row'] = field(init=False, repr=False, compare=True)
+        if 'end_column' not in namespace['__annotations__']:
+            namespace['__annotations__']['end_column'] = 'int'
+        namespace['end_column'] = field(init=False, repr=False, compare=True)
         namespace['_was_lazy_init'] = False
         post_init = namespace.get('__post_init__', lambda self: None)
 
         def post_init_wrapper(self):
-            def unpack_first(key: str) -> typing.Any:
-                value = self.__getattribute__(key)
-                if isinstance(value, list):
-                    return value[0]
-                return value
-
-            def unpack_last(key: str) -> typing.Any:
-                value = self.__getattribute__(key)
-                if isinstance(value, list):
-                    return value[-1]
-                return value
-
             post_init(self)
             if not self._was_lazy_init:
                 lazy_init()
@@ -171,13 +170,13 @@ class NodeMeta(ABCMeta):
             first_child = next(
                 filter(
                     lambda x: hasattr(x, 'row') and hasattr(x, 'column'),
-                    map(unpack_first, children)),
+                    map(lambda key: self.__getattribute__(key), children)),
                 None
             )
             last_child = next(
                 filter(
                     lambda x: hasattr(x, 'end_row') and hasattr(x, 'end_column'),
-                    map(unpack_last, reversed(children))),
+                    map(lambda key: self.__getattribute__(key), reversed(children))),
                 None
             )
 

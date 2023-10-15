@@ -11,4 +11,6 @@ if __name__ == '__main__':
 
     # PARSER TEST
     # ===========>
-    print(Parser(Lexer().load(source).tokenize()).start())
+    print(
+        Parser(Lexer().load(source).tokenize()).start().toFormatString(indent=2)
+    )

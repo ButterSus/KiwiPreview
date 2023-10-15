@@ -14,6 +14,8 @@ __all__ = [
     'TextColor'
 ]
 
+from typing import Tuple
+
 
 # MAIN CONTENT
 # ============>
@@ -72,6 +74,10 @@ class TextColor(str, enum.Enum):
     BG_LIGHT_PURPLE: TextColor = '\033[105m'
     BG_LIGHT_CYAN: TextColor = '\033[106m'
     BG_WHITE: TextColor = '\033[107m'
+
+    def __add__(self, other: TextColor) -> tuple[TextColor, TextColor]:
+        return self, other
+
 
     @classmethod
     def RawCodes(cls) -> typing.Dict[TextColor, str]:

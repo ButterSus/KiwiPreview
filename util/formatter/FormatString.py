@@ -8,6 +8,7 @@ import typing
 from util.formatter.TextColor import *
 from util.formatter.TextEffects import *
 from dataclasses import dataclass, field
+from copy import deepcopy
 
 # EXPORTS
 # =======>
@@ -52,8 +53,8 @@ class FormatString:
     ----------
     [1] https://misc.flogisoft.com/bash/tip_colors_and_formatting
     """
-    string: typing.Any
-    color: TextColor = field(default=TextColor.RESET)
+    string: typing.Any = field(default='')
+    color: TextColor | typing.Iterable[TextColor] = field(default=TextColor.RESET)
     bold: bool = field(default=False)
     underline: bool = field(default=False)
     italic: bool = field(default=False)
@@ -100,7 +101,10 @@ class FormatString:
         """
         string = ''
         for i in range(len(self._strings)):
-            string += self._colors[i].value
+            if isinstance(self._colors[i], TextColor):
+                string += self._colors[i].value
+            else:
+                string += ''.join(map(lambda x: x.value, self._colors[i]))
             if self._bolds[i]:
                 string += TextEffects.BOLD.value
             if self._underlines[i]:
@@ -123,7 +127,53 @@ class FormatString:
         """
         return self.__str__()
 
-    def __add__(self, other: FormatString) -> FormatString:
+    def indent(self, indent=4) -> FormatString:
+        """
+        Indents the format string.
+
+        Parameters
+        ----------
+        indent: int
+            The number of spaces to indent by.
+
+        Returns
+        -------
+        FormatString
+            The indented format string.
+        """
+        buffer = FormatString(' ' * indent)
+        for index, string in enumerate(self._strings):
+            lines = list(map(lambda x: FormatString(
+                string=x, color=self._colors[index], bold=self._bolds[index], underline=self._underlines[index],
+                italic=self._italics[index], strikethrough=self._strikethroughs[index]
+            ), string.split('\n')))
+            buffer += lines[0]
+            for line in lines[1:]:
+                buffer += FormatString('\n' + ' ' * indent) + line
+        return buffer
+
+    def join(self, strings: typing.Iterable[FormatString | str]) -> FormatString:
+        """
+        Joins the format strings.
+
+        Parameters
+        ----------
+        strings: typing.List[FormatString]
+            The format strings to join.
+
+        Returns
+        -------
+        FormatString
+            The joined format string.
+        """
+        buffer = FormatString()
+        for index, string in enumerate(strings):
+            if index > 0:
+                buffer += self
+            buffer += string
+        return buffer
+
+    def __add__(self, other: FormatString | str) -> FormatString:
         """
         Returns the concatenation of the format strings.
 
@@ -137,13 +187,17 @@ class FormatString:
         FormatString
             The concatenation of the format strings.
         """
-        self._strings += other._strings
-        self._colors += other._colors
-        self._bolds += other._bolds
-        self._underlines += other._underlines
-        self._italics += other._italics
-        self._strikethroughs += other._strikethroughs
-        return self
+        cself = deepcopy(self)
+        other = deepcopy(other)
+        if isinstance(other, str):
+            other = FormatString(other)
+        cself._strings += other._strings
+        cself._colors += other._colors
+        cself._bolds += other._bolds
+        cself._underlines += other._underlines
+        cself._italics += other._italics
+        cself._strikethroughs += other._strikethroughs
+        return cself
 
     def toRawString(self) -> str:
         """
@@ -169,4 +223,3 @@ class FormatString:
         for effect, code in TextEffects.RawCodes().items():
             string = string.replace(effect.value, code)
         return string
-

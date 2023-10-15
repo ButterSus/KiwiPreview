@@ -7,7 +7,8 @@ import tokenize
 
 # noinspection PyUnresolvedReferences
 from typing import Optional, Any
-from pegen.parser import Parser, memoize, memoize_left_rec
+from pegen.parser import Parser
+from frontend.parser.memoizetools import memoize, memoize_left_rec
 import frontend.parser.AST as AST
 
 # EXPORTS
@@ -18,6 +19,11 @@ __all__ = ["Parser"]
 
 # MAIN CONTENT
 # ============>
+
+memoize.List = AST.List
+memoize_left_rec.List = AST.List
+
+
 # Keywords and soft keywords are listed at the end of the parser definition.
 class Parser(Parser):
     @memoize
