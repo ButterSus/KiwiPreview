@@ -1,13 +1,62 @@
-@class SyntaxAnalyzer
+# `frontend/parser/Parser.py`
+# --------------------------->
+
+@class Parser
 @header '''
 from __future__ import annotations
 
-from typing import List, Optional, Tuple, Union
-from pegen.parser import memoize, memoize_left_rec, Parser
-from pegen.tokenizer import Tokenizer
+import tokenize
+# IMPORTS
+# =======>
+
+# noinspection PyUnresolvedReferences
+from typing import Optional, Any
+from pegen.parser import (Parser, memoize, memoize_left_rec)
+import frontend.parser.AST as AST
+
+# EXPORTS
+# =======>
+
+__all__ = [
+    'Parser'
+]
 
 
-start:
-    | NUMBER NEWLINE ENDMARKER
+# MAIN CONTENT
+# ============>
 
+'''
 
+start[AST.File]:
+    | i1=packageHeader NEWLINE? ENDMARKER {
+        AST.File(
+            packageHeader=i1
+        )
+    }
+
+packageHeader[AST.PackageHeader]:
+    | 'package' i1=identifier {
+        AST.PackageHeader(
+            identifier=i1
+        )
+    }
+
+identifier[AST.Identifier]:
+    | i1='.'.simpleIdentifier+ {
+        AST.Identifier(
+            attrs=i1
+        )
+    }
+
+simpleIdentifier[AST.TokenWrapper]:
+    | i1=NAME {
+        AST.TokenWrapper(
+            token=i1
+        )
+    }
+
+importList:
+    | NULL
+
+topLevelObject:
+    | NULL
