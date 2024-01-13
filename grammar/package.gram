@@ -1,0 +1,29 @@
+packageHeader[AST.PackageHeader]:
+    | 'package' i1=(&&(identifier)) &&(semi) {
+        AST.PackageHeader(
+            identifier=i1
+        )
+    }
+
+importList[AST.List[AST.ImportHeader]]:
+    | importHeader*
+
+importHeader[AST.ImportHeader]:
+    | 'import' i1=(&&(identifier)) i2=importHeader_i2 &&(semi) {
+        AST.ImportHeader(
+            identifier=i1,
+            alias=i2
+        )
+    }
+
+importHeader_i2[AST.ImportAlias | AST.Null]:
+    | importAlias
+    | '.' '*' { AST.ImportAlias() }
+    | NULL? { AST.Null() }
+
+importAlias[AST.ImportAlias]:
+    | 'as' i1=(&&(simpleIdentifier)) {
+        AST.ImportAlias(
+            identifier=i1
+        )
+    }

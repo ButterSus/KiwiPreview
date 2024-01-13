@@ -114,8 +114,13 @@ class NodeMeta(ABCMeta):
                         return False
                     annotations[key] = effectWrapper.value
                     return isValidAttribute(key, annotations)
-                value_bases = mcs._initialized_classes.get(value, tuple())
-                return any([issubclass(value_base, parentbase) for value_base in value_bases])
+                if not isinstance(value, str):
+                    return False
+                for value in map(str.strip, value.split('|')):
+                    value_bases = mcs._initialized_classes.get(value, tuple())
+                    if any([issubclass(value_base, parentbase) for value_base in value_bases]):
+                        return True
+                return False
 
             nonlocal children
             new_set = set()
@@ -154,9 +159,11 @@ class NodeMeta(ABCMeta):
 
         def post_init_wrapper(self):
             post_init(self)
-            if not self._was_lazy_init:
+            class_object = type(self)
+            # noinspection PyProtectedMember
+            if not class_object._was_lazy_init:
                 lazy_init()
-                self._was_lazy_init = True
+                class_object._was_lazy_init = True
 
             # Row and column
             # -------------->

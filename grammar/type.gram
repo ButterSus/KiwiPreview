@@ -1,0 +1,18 @@
+receiverType[AST.ReceiverType]:
+    | parenthisedType
+    | typeReference
+
+parenthisedType[AST.ParenthisedType]:
+    | '(' type ')'
+
+typeReference:
+    | userType
+
+userType:
+    | simpleUserType
+
+type:
+    | NULL
+
+simpleUserType:
+    | NULL

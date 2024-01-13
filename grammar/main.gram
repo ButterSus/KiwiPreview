@@ -28,38 +28,16 @@ __all__ = [
 
 memoize.List = AST.List
 memoize_left_rec.List = AST.List
+
+# noinspection PyRedundantParentheses
+# noinspection PyUnboundLocalVariable
 '''
 
 start[AST.File]:
-    | i1=packageHeader NEWLINE? ENDMARKER {
+    | i1=packageHeader i2=importList i3=topLevelObjectList semi? &&(ENDMARKER) {
         AST.File(
-            packageHeader=i1
+            packageHeader=i1,
+            importList=i2,
+            declarations=i3
         )
     }
-
-packageHeader[AST.PackageHeader]:
-    | 'package' i1=identifier {
-        AST.PackageHeader(
-            identifier=i1
-        )
-    }
-
-identifier[AST.Identifier]:
-    | i1='.'.simpleIdentifier+ {
-        AST.Identifier(
-            attrs=i1
-        )
-    }
-
-simpleIdentifier[AST.TokenWrapper]:
-    | i1=NAME {
-        AST.TokenWrapper(
-            token=i1
-        )
-    }
-
-importList:
-    | NULL
-
-topLevelObject:
-    | NULL

@@ -1,0 +1,17 @@
+identifier[AST.Identifier]:
+    | i1=simpleIdentifier i2=identifier_i2_List {
+        AST.Identifier(
+            attrs=AST.List(elements=list([i1])) + i2
+        )
+    }
+-> identifier_i2_List:
+    | i1=identifier_i2* { i1 }
+-> identifier_i2:
+    | '.' i1=(&&(simpleIdentifier)) { i1 }
+
+simpleIdentifier[AST.TokenWrapper]:
+    | i1=NAME {
+        AST.TokenWrapper(
+            token=i1
+        )
+    }

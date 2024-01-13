@@ -1,0 +1,8 @@
+topLevelObjectList[AST.List[AST.Declaration]]:
+    | i1=topLevelObject* { i1 }
+
+topLevelObject[AST.Declaration]:
+    | i1=declaration &&(semi) { i1 }
+
+declaration[AST.Declaration]:
+    | functionDeclaration

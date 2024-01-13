@@ -1,0 +1,8 @@
+functionDeclaration[AST.FunctionDeclaration]:
+    | i1=modifiers? 'fun' i2=receiverType i3=identifier '(' ')' {
+        AST.FunctionDeclaration(
+            modifiers=i1,
+            receiverType=i2,
+            identifier=i3
+        )
+    }

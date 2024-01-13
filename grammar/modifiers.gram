@@ -1,0 +1,2 @@
+modifiers[AST.List[AST.Modifier]]:
+    | NULL? { AST.List(elements=list()) }

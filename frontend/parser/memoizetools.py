@@ -17,9 +17,6 @@ __all__ = [
 
 # MAIN CONTENT
 # ============>
-if typing.TYPE_CHECKING:
-    from pegen.parser import Parser
-
 F = typing.TypeVar("F", bound=typing.Callable[..., typing.Any])
 P = typing.TypeVar("P", bound="Parser")
 T = typing.TypeVar("T")

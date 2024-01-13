@@ -4,7 +4,7 @@ import pathlib
 import re
 
 output_file = 'frontend/parser/Parser.py'
-source_file = 'resources/kiwi.gram'
+source_dir = 'grammar'
 build_dir = 'build'
 root = r'C:\Users\Days_\PycharmProjects\KiwiPreview'
 
@@ -21,14 +21,20 @@ def replacement(match):
 
 
 build_path = pathlib.Path(root) / build_dir
-source_path = pathlib.Path(root) / source_file
+source_path = pathlib.Path(root) / source_dir
 output_path = pathlib.Path(root) / output_file
 
 if __name__ == '__main__':
     try:
-        with open(pathlib.Path(root) / source_file, 'r') as f:
-            grammar = f.read()
+        grammar = str()
+        for file in source_path.glob('*.gram'):
+            with open(file, 'r') as f:
+                if file.stem == 'main':
+                    grammar = f.read() + '\n' + grammar
+                else:
+                    grammar += f.read() + '\n'
         grammar = re.sub(r'\b([A-Z]+)\b', replacement, grammar, flags=re.DOTALL)
+        grammar = re.sub(r'^\s*(->\s*)+', str(), grammar, flags=re.MULTILINE)
         # Run replacements on the grammar file
         build_path.mkdir(parents=True, exist_ok=True)
         with open(build_path / 'grammar', 'w+') as f:
